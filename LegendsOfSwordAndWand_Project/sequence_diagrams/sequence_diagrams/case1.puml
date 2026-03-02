@@ -1,0 +1,71 @@
+@startuml
+actor User
+participant GUI
+participant AuthController
+participant ProfileService
+database DB
+
+== Register New Profile ==
+
+User -> GUI : Enter username & password
+activate GUI
+
+GUI -> AuthController : register(username, password)
+activate AuthController
+
+AuthController -> ProfileService : createProfile(username, password)
+activate ProfileService
+
+ProfileService -> DB : checkIfUserExists(username)
+activate DB
+DB --> ProfileService : exists / not exists
+deactivate DB
+
+alt username not taken
+    ProfileService -> DB : INSERT new user
+    activate DB
+    DB --> ProfileService : success
+    deactivate DB
+
+    ProfileService --> AuthController : registrationSuccess
+    AuthController --> GUI : showSuccessMessage()
+else username exists
+    ProfileService --> AuthController : registrationFailed
+    AuthController --> GUI : showError("Username taken")
+end
+
+deactivate ProfileService
+deactivate AuthController
+deactivate GUI
+
+
+== Login ==
+
+User -> GUI : Enter credentials
+activate GUI
+
+GUI -> AuthController : login(username, password)
+activate AuthController
+
+AuthController -> ProfileService : validateCredentials()
+activate ProfileService
+
+ProfileService -> DB : SELECT user by username
+activate DB
+DB --> ProfileService : user record
+deactivate DB
+
+alt credentials valid
+    ProfileService --> AuthController : loginSuccess
+    AuthController --> GUI : loadProfileView()
+    GUI --> User : Display saved data
+else credentials invalid
+    ProfileService --> AuthController : loginFailed
+    AuthController --> GUI : showError("Invalid login")
+end
+
+deactivate ProfileService
+deactivate AuthController
+deactivate GUI
+
+@enduml

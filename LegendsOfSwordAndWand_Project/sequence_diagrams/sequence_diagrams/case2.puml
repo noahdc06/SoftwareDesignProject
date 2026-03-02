@@ -1,0 +1,37 @@
+@startuml
+actor User
+participant GUI
+participant CampaignController
+participant HeroFactory
+participant CampaignService
+database DB
+
+User -> GUI : Select "New PvE"
+activate GUI
+
+GUI -> CampaignController : startNewCampaign(classChoice)
+activate CampaignController
+
+CampaignController -> HeroFactory : createHero(classChoice)
+activate HeroFactory
+HeroFactory --> CampaignController : hero(level=1)
+deactivate HeroFactory
+
+CampaignController -> CampaignService : initializeCampaign(hero)
+activate CampaignService
+
+CampaignService -> DB : INSERT campaign + hero data
+activate DB
+DB --> CampaignService : campaignID
+deactivate DB
+
+CampaignService --> CampaignController : campaignState
+deactivate CampaignService
+
+CampaignController --> GUI : loadCampaignView(campaignState)
+deactivate CampaignController
+
+GUI --> User : Display Campaign Screen
+deactivate GUI
+
+@enduml
