@@ -3,7 +3,9 @@
 actor User
 participant GUI
 participant PvECampaign
+participant HeroFactory
 participant BattleService
+participant HeroLevelUp
 participant ScoreService
 database DB
 
@@ -18,9 +20,10 @@ deactivate GUI
 
 User -> GUI : selectHeroClass()
 activate GUI
-GUI -> PvECampaign : createHero()
-activate PvECampaign
-deactivate PvECampaign
+GUI -> HeroFactory : createHero()
+activate HeroFactory
+HeroFactory --> PvECampaign : Hero
+deactivate HeroFactory
 deactivate GUI
 
 == During Campaign ==
@@ -35,6 +38,12 @@ alt Battle Room
     activate BattleService
     BattleService --> GUI : battleResults()
     deactivate BattleService
+    alt Level-up
+        GUI -> HeroLevelUp : levelUp()
+        activate HeroLevelUp
+        HeroLevelUp --> PvECampaign : HeroLeveledUP
+        deactivate HeroLevelUp
+    end
 else Inn Room
     PvECampaign --> GUI : showInnView()
 end
