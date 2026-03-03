@@ -1,37 +1,76 @@
 @startuml
+
 actor User
 participant GUI
-participant CampaignController
-participant HeroFactory
-participant CampaignService
+participant PvECampaign
+participant BattleService
+participant ScoreService
 database DB
 
-User -> GUI : Select "New PvE"
+== Start Campaign ==
+
+User -> GUI : startCampaign()
 activate GUI
+GUI -> PvECampaign : startCampaign()
+activate PvECampaign
+deactivate PvECampaign
+deactivate GUI
 
-GUI -> CampaignController : startNewCampaign(classChoice)
-activate CampaignController
+User -> GUI : selectHeroClass()
+activate GUI
+GUI -> PvECampaign : createHero()
+activate PvECampaign
+deactivate PvECampaign
+deactivate GUI
 
-CampaignController -> HeroFactory : createHero(classChoice)
-activate HeroFactory
-HeroFactory --> CampaignController : hero(level=1)
-deactivate HeroFactory
+== During Campaign ==
 
-CampaignController -> CampaignService : initializeCampaign(hero)
-activate CampaignService
+User -> GUI : nextRoom()
+activate GUI
+GUI -> PvECampaign : nextRoom()
+activate PvECampaign
 
-CampaignService -> DB : INSERT campaign + hero data
+alt Battle Room
+    PvECampaign -> BattleService : startBattle()
+    activate BattleService
+    BattleService --> GUI : battleResults(xp, gold)
+    deactivate BattleService
+else Inn Room
+    PvECampaign --> GUI : showInnView()
+end
+
+deactivate PvECampaign
+deactivate GUI
+
+== After 30 Rooms ==
+
+GUI -> PvECampaign : checkCompletion()
+activate PvECampaign
+PvECampaign -> ScoreService : calculateScore()
+activate ScoreService
+ScoreService -> DB : saveScore()
 activate DB
-DB --> CampaignService : campaignID
+deactivate DB
+deactivate ScoreService
+deactivate PvECampaign
+
+GUI -> DB : getRanking()
+activate DB
+DB --> GUI : ranking
 deactivate DB
 
-CampaignService --> CampaignController : campaignState
-deactivate CampaignService
+== Party Limit ==
 
-CampaignController --> GUI : loadCampaignView(campaignState)
-deactivate CampaignController
+GUI -> DB : getStoredParties()
+activate DB
+DB --> GUI : parties
+deactivate DB
 
-GUI --> User : Display Campaign Screen
-deactivate GUI
+alt 5 Parties
+    GUI -> User : promptReplaceParty()
+    GUI -> DB : deleteParty()
+    activate DB
+    deactivate DB
+end
 
 @enduml
