@@ -33,7 +33,7 @@ activate PvECampaign
 alt Battle Room
     PvECampaign -> BattleService : startBattle()
     activate BattleService
-    BattleService --> GUI : battleResults(xp, gold)
+    BattleService --> GUI : battleResults()
     deactivate BattleService
 else Inn Room
     PvECampaign --> GUI : showInnView()
