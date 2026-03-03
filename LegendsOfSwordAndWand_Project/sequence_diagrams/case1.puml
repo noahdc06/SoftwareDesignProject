@@ -1,8 +1,7 @@
 @startuml
 actor User
 participant GUI
-participant AuthController
-participant ProfileService
+participant UserDAO
 database DB
 
 == Register New Profile ==
@@ -10,32 +9,26 @@ database DB
 User -> GUI : Enter username & password
 activate GUI
 
-GUI -> AuthController : register(username, password)
-activate AuthController
+GUI -> UserDAO : createUser(username, password)
+activate UserDAO
 
-AuthController -> ProfileService : createProfile(username, password)
-activate ProfileService
-
-ProfileService -> DB : checkIfUserExists(username)
+UserDAO -> DB : checkIfUserExists(username)
 activate DB
-DB --> ProfileService : exists / not exists
+DB --> UserDAO : exists / not exists
 deactivate DB
 
 alt username not taken
-    ProfileService -> DB : INSERT new user
+    UserDAO -> DB : INSERT INTO users (username, password) VALUES (?, ?)
     activate DB
-    DB --> ProfileService : success
+    DB --> UserDAO : success
     deactivate DB
 
-    ProfileService --> AuthController : registrationSuccess
-    AuthController --> GUI : showSuccessMessage()
+    UserDAO -->  GUI : "user data saved to database"
 else username exists
-    ProfileService --> AuthController : registrationFailed
-    AuthController --> GUI : showError("Username taken")
+    UserDAO --> GUI : showError("Username taken")
 end
 
-deactivate ProfileService
-deactivate AuthController
+deactivate UserDAO
 deactivate GUI
 
 
@@ -44,28 +37,27 @@ deactivate GUI
 User -> GUI : Enter credentials
 activate GUI
 
-GUI -> AuthController : login(username, password)
-activate AuthController
+GUI -> UserDAO : login(username, password)
+activate UserDAO
 
-AuthController -> ProfileService : validateCredentials()
-activate ProfileService
-
-ProfileService -> DB : SELECT user by username
+UserDAO -> DB : validateCredentials()
 activate DB
-DB --> ProfileService : user record
+DB --> UserDAO : valid/invalid credentials
+
+UserDAO -> DB : SELECT * FROM users WHERE username=? AND password=?
+
+
+DB --> UserDAO : user record
 deactivate DB
 
 alt credentials valid
-    ProfileService --> AuthController : loginSuccess
-    AuthController --> GUI : loadProfileView()
+    UserDAO --> GUI : loadProfileView()
     GUI --> User : Display saved data
 else credentials invalid
-    ProfileService --> AuthController : loginFailed
-    AuthController --> GUI : showError("Invalid login")
+    UserDAO --> GUI : showError("Invalid login")
 end
 
-deactivate ProfileService
-deactivate AuthController
+deactivate UserDAO
 deactivate GUI
 
 @enduml
