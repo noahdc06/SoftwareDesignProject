@@ -1,19 +1,8 @@
-package com.legends.database;
+package com.legends.Design_Patterns;
 
-public class DatabaseConnection {
+import com.legends.model.Profile;
+import com.legends.model.Enemy;
 
-    private static DatabaseConnection instance;
-
-    private DatabaseConnection() {}
-
-    public static DatabaseConnection getInstance() {
-        if (instance == null) {
-            instance = new DatabaseConnection();
-        }
-        return instance;
-    }
-
-    public void saveDeath(String name) {
-        System.out.println("Saving death for: " + name);
-    }
+public interface PlayerAction {
+    void execute(Profile player, Enemy enemy);
 }
