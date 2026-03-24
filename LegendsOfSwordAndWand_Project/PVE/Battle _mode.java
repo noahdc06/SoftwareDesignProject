@@ -44,6 +44,5 @@ public class BattleFeature {
 
     private void recordDeath(Profile profile) {
         System.out.println("Saving death for: " + profile.getName());
-        // later connect to SQL
     }
 }
