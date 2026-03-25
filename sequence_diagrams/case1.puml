@@ -1,0 +1,63 @@
+@startuml
+actor User
+participant GUI
+participant UserDAO
+database DB
+
+== Register New Profile ==
+
+User -> GUI : Enter username & password
+activate GUI
+
+GUI -> UserDAO : createUser(username, password)
+activate UserDAO
+
+UserDAO -> DB : checkIfUserExists(username)
+activate DB
+DB --> UserDAO : exists / not exists
+deactivate DB
+
+alt username not taken
+    UserDAO -> DB : INSERT INTO users (username, password) VALUES (?, ?)
+    activate DB
+    DB --> UserDAO : success
+    deactivate DB
+
+    UserDAO -->  GUI : "user data saved to database"
+else username exists
+    UserDAO --> GUI : showError("Username taken")
+end
+
+deactivate UserDAO
+deactivate GUI
+
+
+== Login ==
+
+User -> GUI : Enter credentials
+activate GUI
+
+GUI -> UserDAO : login(username, password)
+activate UserDAO
+
+UserDAO -> DB : validateCredentials()
+activate DB
+DB --> UserDAO : valid/invalid credentials
+
+UserDAO -> DB : SELECT * FROM users WHERE username=? AND password=?
+
+
+DB --> UserDAO : user record
+deactivate DB
+
+alt credentials valid
+    UserDAO --> GUI : loadProfileView()
+    GUI --> User : Display saved data
+else credentials invalid
+    UserDAO --> GUI : showError("Invalid login")
+end
+
+deactivate UserDAO
+deactivate GUI
+
+@enduml

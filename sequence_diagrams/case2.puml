@@ -1,0 +1,85 @@
+@startuml
+
+actor User
+participant GUI
+participant PvECampaign
+participant HeroFactory
+participant BattleService
+participant HeroLevelUp
+participant ScoreService
+database DB
+
+== Start Campaign ==
+
+User -> GUI : startCampaign()
+activate GUI
+GUI -> PvECampaign : startCampaign()
+activate PvECampaign
+deactivate PvECampaign
+deactivate GUI
+
+User -> GUI : selectHeroClass()
+activate GUI
+GUI -> HeroFactory : createHero()
+activate HeroFactory
+HeroFactory --> PvECampaign : Hero
+deactivate HeroFactory
+deactivate GUI
+
+== During Campaign ==
+
+User -> GUI : nextRoom()
+activate GUI
+GUI -> PvECampaign : nextRoom()
+activate PvECampaign
+
+alt Battle Room
+    PvECampaign -> BattleService : startBattle()
+    activate BattleService
+    BattleService --> GUI : battleResults()
+    deactivate BattleService
+    alt Level-up
+        GUI -> HeroLevelUp : levelUp()
+        activate HeroLevelUp
+        HeroLevelUp --> PvECampaign : HeroLeveledUP
+        deactivate HeroLevelUp
+    end
+else Inn Room
+    PvECampaign --> GUI : showInnView()
+end
+
+deactivate PvECampaign
+deactivate GUI
+
+== After 30 Rooms ==
+
+GUI -> PvECampaign : checkCompletion()
+activate PvECampaign
+PvECampaign -> ScoreService : calculateScore()
+activate ScoreService
+ScoreService -> DB : saveScore()
+activate DB
+deactivate DB
+deactivate ScoreService
+deactivate PvECampaign
+
+GUI -> DB : getRanking()
+activate DB
+DB --> GUI : ranking
+deactivate DB
+
+== Party Limit ==
+
+GUI -> DB : getStoredParties()
+activate DB
+DB --> GUI : parties
+deactivate DB
+
+alt 5 Parties
+    GUI -> User : promptReplaceParty()
+    GUI -> DB : deleteParty()
+    activate DB
+    deactivate DB
+end
+
+@enduml

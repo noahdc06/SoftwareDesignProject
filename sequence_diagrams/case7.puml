@@ -1,0 +1,80 @@
+@startuml
+actor Player1
+actor Player2
+participant PvPGUI
+participant PvPController
+participant PvPService
+database DB
+
+== Send Invitation ==
+
+Player1 -> PvPGUI : Enter opponent username
+activate PvPGUI
+
+PvPGUI -> PvPController : sendInvitation(username)
+activate PvPController
+
+PvPController -> PvPService : validatePlayers(player1, username)
+activate PvPService
+
+PvPService -> DB : checkUserExists(username)
+activate DB
+DB --> PvPService : user exists / not exists
+deactivate DB
+
+PvPService -> DB : checkBothHaveSavedParties()
+activate DB
+DB --> PvPService : party status
+deactivate DB
+
+alt valid opponent AND both have parties
+    PvPService --> PvPController : invitationValid
+    PvPController --> Player2 : notifyInvitation()
+else invalid conditions
+    PvPService --> PvPController : invitationFailed
+    PvPController --> PvPGUI : showError()
+end
+
+deactivate PvPService
+deactivate PvPController
+deactivate PvPGUI
+
+
+== Accept Invitation ==
+
+Player2 -> PvPGUI : Accept Invitation
+activate PvPGUI
+
+PvPGUI -> PvPController : acceptInvitation()
+activate PvPController
+
+PvPController -> PvPService : initializePvPBattle()
+activate PvPService
+
+PvPService -> DB : fetchSelectedParties()
+activate DB
+DB --> PvPService : party1, party2
+deactivate DB
+
+PvPService --> PvPController : battleState
+PvPController --> PvPGUI : loadBattleView()
+
+deactivate PvPService
+deactivate PvPController
+deactivate PvPGUI
+
+
+== After Battle Ends ==
+
+PvPController -> PvPService : processResult()
+activate PvPService
+
+PvPService -> DB : updateWinsLosses()
+activate DB
+DB --> PvPService : success
+deactivate DB
+
+PvPService --> PvPController : resultStored
+deactivate PvPService
+
+@enduml
