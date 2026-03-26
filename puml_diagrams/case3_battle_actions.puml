@@ -1,0 +1,46 @@
+@startuml
+actor User
+participant BattlePage
+participant BattleEngine
+participant Hero
+participant Target as Unit
+participant Party
+
+== Player Action ==
+
+User -> BattlePage : Click Attack / Recover / Spell
+activate BattlePage
+BattlePage -> BattleEngine : performPlayerAction(AttackCommand)
+activate BattleEngine
+
+alt Attack
+    BattleEngine -> Party : get target by index
+    Party --> BattleEngine : target
+    BattleEngine -> Hero : dealDamageTo(target)
+    Hero -> Unit : takeDamageRaw(damage)
+    Unit --> Hero : updated HP
+    Hero --> BattleEngine : damage
+else Recover
+    BattleEngine -> Hero : heal(hero.attack)
+else Spell 1 / Spell 2
+    BattleEngine -> Hero : get hero class
+    BattleEngine -> BattleEngine : useSpell1 / useSpell2
+end
+
+BattleEngine -> BattleEngine : evaluateBattleState()
+BattleEngine -> BattleEngine : advanceToNextActiveTurn()
+BattleEngine --> BattlePage : updated battle log + state
+deactivate BattleEngine
+deactivate BattlePage
+
+== End Check ==
+
+BattleEngine -> Party : allDowned()
+alt enemies all downed
+    BattleEngine --> BattlePage : "Victory"
+else heroes all downed
+    BattleEngine --> BattlePage : "Game over"
+else battle continues
+    BattleEngine --> BattlePage : next turn
+end
+@enduml

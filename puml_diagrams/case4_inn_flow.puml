@@ -1,0 +1,44 @@
+@startuml
+actor User
+participant InnPage
+participant PvECampaign
+participant HomePage
+participant BattlePage
+participant UserDAO
+database DB
+
+== View Inn ==
+
+User -> InnPage : Open inn room
+activate InnPage
+InnPage --> User : Show level, room, hero stats, abilities
+
+== Exit ==
+
+User -> InnPage : Click Exit
+InnPage -> HomePage : return to menu
+HomePage --> User : Show home page
+
+== Next ==
+
+User -> InnPage : Click Next
+InnPage -> PvECampaign : completeInnRoomAndSave()
+activate PvECampaign
+PvECampaign -> UserDAO : updateProgress(profile)
+activate UserDAO
+UserDAO -> DB : UPDATE users SET room_count=?
+activate DB
+DB --> UserDAO : success
+deactivate DB
+deactivate UserDAO
+deactivate PvECampaign
+
+alt room limit reached
+    InnPage -> PvECampaign : resetCampaign()
+    InnPage -> HomePage : return to menu
+else continue campaign
+    InnPage -> BattlePage : startPvEFlow()
+end
+
+deactivate InnPage
+@enduml

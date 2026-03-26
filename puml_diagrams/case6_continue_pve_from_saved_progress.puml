@@ -1,0 +1,31 @@
+@startuml
+actor User
+participant HomePage
+participant PvECampaign
+participant Profile
+participant BattlePage
+participant InnPage
+
+User -> HomePage : Click "Enter PvE"
+activate HomePage
+HomePage -> Profile : get partyLevel and roomCount
+Profile --> HomePage : saved values
+
+HomePage -> PvECampaign : determineCurrentRoomType()
+activate PvECampaign
+
+alt roomCount == 1
+    PvECampaign --> HomePage : INN
+    HomePage -> BattlePage : startPvEFlow()
+    BattlePage -> InnPage : open inn
+else battle room
+    PvECampaign --> HomePage : BATTLE
+    HomePage -> BattlePage : open battle with saved partyLevel
+else campaign complete
+    PvECampaign --> HomePage : CAMPAIGN_COMPLETE
+    HomePage --> User : completion popup
+end
+
+deactivate PvECampaign
+deactivate HomePage
+@enduml

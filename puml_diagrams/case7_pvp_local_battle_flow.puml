@@ -1,0 +1,45 @@
+@startuml
+actor Player1
+actor Player2
+participant HomePage
+participant PvPSetupPage
+participant BattlePage
+participant BattleEngine
+
+== Setup ==
+
+Player1 -> HomePage : Click "PvP"
+activate HomePage
+HomePage -> PvPSetupPage : open()
+deactivate HomePage
+
+Player1 -> PvPSetupPage : Choose party level
+Player1 -> PvPSetupPage : Click "Start PvP"
+activate PvPSetupPage
+PvPSetupPage -> BattlePage : open(BattleMode.PVP, partyLevel)
+activate BattlePage
+BattlePage -> BattleEngine : create P1 and P2 parties
+BattleEngine --> BattlePage : battle state with renamed heroes
+deactivate PvPSetupPage
+
+== Battle ==
+
+Player1 -> BattlePage : Take action for current P1 hero
+BattlePage -> BattleEngine : performPlayerAction(command)
+
+Player2 -> BattlePage : Take action for current P2 hero
+BattlePage -> BattleEngine : performPlayerAction(command)
+
+BattleEngine -> BattleEngine : alternate turn order
+BattleEngine -> BattleEngine : evaluateBattleState()
+
+alt one side all downed
+    BattleEngine --> BattlePage : winner text
+    BattlePage --> Player1 : show result popup
+    BattlePage --> Player2 : show result popup
+else battle continues
+    BattleEngine --> BattlePage : next turn
+end
+
+deactivate BattlePage
+@enduml
