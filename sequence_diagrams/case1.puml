@@ -1,63 +1,24 @@
-@startuml
+@startuml case1_login
 actor User
-participant GUI
-participant UserDAO
-database DB
+participant "GUI" as UI
+participant "AuthController" as Auth
+participant "UserService" as Service
+database "Database" as DB
 
-== Register New Profile ==
+User -> UI : enter username/password
+UI -> Auth : login(username, password)
 
-User -> GUI : Enter username & password
-activate GUI
+Auth -> Service : validateUser()
+Service -> DB : fetchUser(username)
 
-GUI -> UserDAO : createUser(username, password)
-activate UserDAO
+DB --> Service : user data / null
+Service --> Auth : valid / invalid
 
-UserDAO -> DB : checkIfUserExists(username)
-activate DB
-DB --> UserDAO : exists / not exists
-deactivate DB
-
-alt username not taken
-    UserDAO -> DB : INSERT INTO users (username, password) VALUES (?, ?)
-    activate DB
-    DB --> UserDAO : success
-    deactivate DB
-
-    UserDAO -->  GUI : "user data saved to database"
-else username exists
-    UserDAO --> GUI : showError("Username taken")
+alt valid
+    Auth -> UI : loginSuccess()
+    UI -> User : show dashboard
+else invalid
+    Auth -> UI : loginFailed()
+    UI -> User : show error
 end
-
-deactivate UserDAO
-deactivate GUI
-
-
-== Login ==
-
-User -> GUI : Enter credentials
-activate GUI
-
-GUI -> UserDAO : login(username, password)
-activate UserDAO
-
-UserDAO -> DB : validateCredentials()
-activate DB
-DB --> UserDAO : valid/invalid credentials
-
-UserDAO -> DB : SELECT * FROM users WHERE username=? AND password=?
-
-
-DB --> UserDAO : user record
-deactivate DB
-
-alt credentials valid
-    UserDAO --> GUI : loadProfileView()
-    GUI --> User : Display saved data
-else credentials invalid
-    UserDAO --> GUI : showError("Invalid login")
-end
-
-deactivate UserDAO
-deactivate GUI
-
 @enduml
