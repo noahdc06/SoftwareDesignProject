@@ -1,0 +1,67 @@
+@startuml
+package com.legends.battle {
+  enum BattleMode {
+    PVE
+    PVP
+  }
+
+  enum Command {
+    ATTACK
+    RECOVER
+    SPELL_1
+    SPELL_2
+  }
+
+  class AttackCommand {
+    -command : Command
+    -targetIndex : int
+    +AttackCommand(command : Command, targetIndex : int)
+    +getCommand() : Command
+    +getTargetIndex() : int
+  }
+
+  class BattleEngine {
+    -mode : BattleMode
+    -heroesParty : Party
+    -enemiesParty : Party
+    -turnIndex : int
+    -battleLog : String
+    -finished : boolean
+    -winnerText : String
+    +BattleEngine(partyLevel : int, mode : BattleMode)
+    +getHeroesParty() : Party
+    +getEnemiesParty() : Party
+    +getBattleLog() : String
+    +isFinished() : boolean
+    +getWinnerText() : String
+    +getCurrentUnit() : Unit
+    +getCurrentTurnLabel() : String
+    +getCurrentActionLabels() : String[]
+    +getSpellDescription(hero : Hero, spell1 : boolean) : String
+    +performPlayerAction(action : AttackCommand) : void
+    +performAutomaticTurnsUntilPlayerNeeded() : void
+    +restoreHeroesForNextBattle() : void
+    +fullyRestoreHeroesAtInn() : void
+  }
+}
+
+package com.legends.model {
+  class Party
+  class Hero
+  class Unit
+  class Enemy
+}
+
+package com.legends.spell {
+  interface SpellStrategy
+}
+
+AttackCommand --> Command
+BattleEngine --> BattleMode
+BattleEngine --> AttackCommand
+BattleEngine --> Party
+BattleEngine --> Hero
+BattleEngine --> Unit
+BattleEngine --> Enemy
+BattleEngine --> SpellStrategy
+@enduml

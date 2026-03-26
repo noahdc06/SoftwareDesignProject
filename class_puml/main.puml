@@ -1,0 +1,15 @@
+@startuml
+package com.legends.main {
+  class GameMain {
+    +main(args : String[]) : void
+  }
+}
+
+package com.legends.ui {
+  class LoginPage
+  class HomePage
+}
+
+GameMain --> LoginPage : starts app
+GameMain --> HomePage
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+package com.legends.service {
+  class SessionManager {
+    -currentProfile : Profile
+    +setCurrentProfile(profile : Profile) : void
+    +getCurrentProfile() : Profile
+    +clearSession() : void
+  }
+}
+
+package com.legends.model {
+  class Profile
+}
+
+SessionManager --> Profile
+@enduml

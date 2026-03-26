@@ -1,0 +1,33 @@
+@startuml
+package com.legends.campaign {
+  class PvECampaign {
+    -profile : Profile
+    -userDAO : UserDAO
+    +PvECampaign(profile : Profile)
+    +getProfile() : Profile
+    +determineCurrentRoomType() : RoomType
+    +completeBattle() : void
+    +completeInnRoomAndSave() : void
+    +saveAtInnWithoutAdvancing() : void
+    +resetCampaign() : void
+  }
+
+  enum RoomType {
+    BATTLE
+    INN
+    CAMPAIGN_COMPLETE
+  }
+}
+
+package com.legends.model {
+  class Profile
+}
+
+package com.legends.database {
+  class UserDAO
+}
+
+PvECampaign --> Profile
+PvECampaign --> UserDAO
+PvECampaign --> RoomType
+@enduml

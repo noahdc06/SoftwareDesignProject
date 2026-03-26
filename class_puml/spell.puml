@@ -1,0 +1,34 @@
+@startuml
+package com.legends.spell {
+  interface SpellStrategy {
+    +useSpell1(hero : Hero, actorParty : Party, targetParty : Party, random : Random, partyLevel : int) : String
+    +useSpell2(hero : Hero, actorParty : Party, targetParty : Party, random : Random, partyLevel : int) : String
+    +getSpell1Description() : String
+    +getSpell2Description() : String
+  }
+
+  class RogueSpellStrategy
+  class WarriorSpellStrategy
+  class MageSpellStrategy
+  class ClericSpellStrategy
+
+  SpellStrategy <|.. RogueSpellStrategy
+  SpellStrategy <|.. WarriorSpellStrategy
+  SpellStrategy <|.. MageSpellStrategy
+  SpellStrategy <|.. ClericSpellStrategy
+}
+
+package com.legends.model {
+  class Hero
+  class Party
+}
+
+RogueSpellStrategy --> Hero
+RogueSpellStrategy --> Party
+WarriorSpellStrategy --> Hero
+WarriorSpellStrategy --> Party
+MageSpellStrategy --> Hero
+MageSpellStrategy --> Party
+ClericSpellStrategy --> Hero
+ClericSpellStrategy --> Party
+@enduml

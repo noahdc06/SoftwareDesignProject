@@ -1,0 +1,27 @@
+@startuml
+package com.legends.database {
+  class DatabaseConnection {
+    -URL : String
+    -USER : String
+    -PASSWORD : String
+    +getConnection() : Connection
+  }
+
+  class UserDAO {
+    +createUser(username : String, password : String) : boolean
+    +login(username : String, password : String) : Profile
+    +updateProgress(profile : Profile) : void
+    +resetProgress(profile : Profile) : void
+  }
+}
+
+package com.legends.model {
+  class Profile
+}
+
+database MySQL
+
+UserDAO --> DatabaseConnection
+UserDAO --> Profile
+DatabaseConnection --> MySQL
+@enduml

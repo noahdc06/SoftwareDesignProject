@@ -1,0 +1,42 @@
+@startuml
+package com.legends.ui {
+  class LoginPage
+  class CreateProfilePage
+  class HomePage
+  class BattlePage
+  class InnPage
+  class PvPSetupPage
+  class UIStyle
+}
+
+package com.legends.campaign {
+  class PvECampaign
+}
+
+package com.legends.battle {
+  class BattleEngine
+  enum BattleMode
+  class AttackCommand
+  enum Command
+}
+
+package com.legends.database {
+  class UserDAO
+}
+
+package com.legends.model {
+  class Hero
+}
+
+LoginPage --> UserDAO
+CreateProfilePage --> UserDAO
+HomePage --> PvECampaign
+HomePage --> BattlePage
+HomePage --> PvPSetupPage
+BattlePage --> BattleEngine
+BattlePage --> AttackCommand
+BattlePage --> Command
+BattlePage --> BattleMode
+InnPage --> PvECampaign
+InnPage --> Hero
+@enduml

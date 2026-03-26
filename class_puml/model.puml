@@ -1,0 +1,76 @@
+@startuml
+package com.legends.model {
+  class Profile {
+    -username : String
+    -password : String
+    -partyLevel : int
+    -roomCount : int
+    +getUsername() : String
+    +getPassword() : String
+    +getPartyLevel() : int
+    +setPartyLevel(partyLevel : int) : void
+    +getRoomCount() : int
+    +setRoomCount(roomCount : int) : void
+  }
+
+  abstract class Unit {
+    -name : String
+    -attack : int
+    -defense : int
+    -maxHealth : int
+    -currentHealth : int
+    +getName() : String
+    +setName(name : String) : void
+    +getAttack() : int
+    +getDefense() : int
+    +setDefense(defense : int) : void
+    +getMaxHealth() : int
+    +getCurrentHealth() : int
+    +heal(amount : int) : void
+    +takeDamageRaw(damage : int) : void
+    +dealDamageTo(target : Unit) : int
+    +fullyRestore() : void
+    +isDowned() : boolean
+    +getStatLine() : String
+  }
+
+  enum HeroClass {
+    ROGUE
+    WARRIOR
+    MAGE
+    CLERIC
+    +getDisplayName() : String
+    +getAttackPerLevel() : int
+    +getHealthPerLevel() : int
+    +getDefensePerLevel() : int
+    +getSpell1Name() : String
+    +getSpell2Name() : String
+  }
+
+  class Hero {
+    -heroClass : HeroClass
+    +Hero(heroClass : HeroClass, partyLevel : int)
+    +getHeroClass() : HeroClass
+    +getSpell1Name() : String
+    +getSpell2Name() : String
+  }
+
+  class Enemy {
+    +Enemy(name : String, partyLevel : int, random : Random)
+  }
+
+  class Party {
+    -units : List<Unit>
+    +Party(units : List)
+    +getUnits() : List<Unit>
+    +getHeroes() : List<Hero>
+    +getByIndex(index : int) : Unit
+    +allDowned() : boolean
+  }
+
+  Unit <|-- Hero
+  Unit <|-- Enemy
+  Hero --> HeroClass
+  Party o-- Unit
+}
+@enduml
