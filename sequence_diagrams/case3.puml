@@ -1,56 +1,28 @@
-@startuml
+@startuml case3_battle
 actor User
-participant GUI
-participant BattleController
-participant BattleService
-participant Attacker as UnitA
-participant Defender as UnitD
-database DB
+participant UI
+participant "BattleController" as Controller
+participant "BattleService" as Service
+participant "TurnManager" as Turn
+participant "Unit" as Unit
 
-== Player Turn ==
+UI -> Controller : startBattle(party, enemies)
+Controller -> Service : initializeBattle()
 
-User -> GUI : Select Action (Attack)
-activate GUI
+loop turns
+    Service -> Turn : nextUnit()
+    Turn --> Service : currentUnit
 
-GUI -> BattleController : executeAction(action, target)
-activate BattleController
+    Service -> UI : show actions
+    User -> UI : choose action
 
-BattleController -> BattleService : processAction(action, target)
-activate BattleService
+    UI -> Controller : performAction()
+    Controller -> Service : executeAction()
 
-BattleService -> UnitA : getAttack()
-UnitA --> BattleService : attackValue
-
-BattleService -> UnitD : getDefense()
-UnitD --> BattleService : defenseValue
-
-BattleService -> UnitD : applyDamage(attack - defense)
-UnitD --> BattleService : updatedHP
-
-BattleService --> BattleController : updatedBattleState
-deactivate BattleService
-
-BattleController --> GUI : refreshStats()
-deactivate BattleController
-deactivate GUI
-
-== Check End Condition ==
-
-BattleController -> BattleService : checkBattleEnd()
-activate BattleService
-
-alt one party defeated
-    BattleService -> DB : calculateExpAndGold()
-    activate DB
-    DB --> BattleService : exp, gold
-    deactivate DB
-
-    BattleService --> BattleController : battleResult
-    BattleController --> GUI : showBattleResult()
-else battle continues
-    BattleService --> BattleController : nextTurn()
+    Service -> Unit : applyDamage()/defend()
+    Unit --> Service : updated stats
 end
 
-deactivate BattleService
-
+Service -> Controller : battleResult
+Controller -> UI : display results
 @enduml
