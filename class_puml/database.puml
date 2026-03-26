@@ -1,5 +1,8 @@
 @startuml
+skinparam classAttributeIconSize 0
+
 package com.legends.database {
+
   class DatabaseConnection {
     -URL : String
     -USER : String
@@ -13,15 +16,31 @@ package com.legends.database {
     +updateProgress(profile : Profile) : void
     +resetProgress(profile : Profile) : void
   }
+
+  interface IUserDAO {
+    +createUser(username : String, password : String) : boolean
+    +login(username : String, password : String) : Profile
+    +updateProgress(profile : Profile) : void
+    +resetProgress(profile : Profile) : void
+  }
+
+  UserDAO ..|> IUserDAO
 }
 
 package com.legends.model {
-  class Profile
+  class Profile {
+    -username : String
+    -password : String
+    -partyLevel : int
+    -roomCount : int
+  }
 }
 
 database MySQL
 
-UserDAO --> DatabaseConnection
-UserDAO --> Profile
-DatabaseConnection --> MySQL
+' Relationships
+UserDAO --> DatabaseConnection : uses
+UserDAO --> Profile : maps data
+DatabaseConnection --> MySQL : JDBC connection
+
 @enduml
